@@ -1,0 +1,106 @@
+initial setup should look like this
+
+|-- backend
+|   |-- app
+|       |-- api
+|       |-- core
+|       |-- db
+|       |-- emails
+|       |-- models
+|       |-- services
+|       |-- utils
+|   |-- tests
+|       |-- conftest.py
+|   |-- .env
+|   |-- Dockerfile
+|   |-- requirements.txt
+|-- .flake8
+|-- .gitignore
+|-- docker-compose.yml
+|-- README.md
+ 
+requirements.txt
+# app
+fastapi==0.55.1
+uvicorn==0.11.3
+pydantic==1.4
+email-validator==1.1.1
+
+=================================
+# create a server
+
+touch backend/app/api/__init__.py backend/app/api/server.py
+
+from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
+ 
+ 
+def get_application():
+    app = FastAPI(title="Phresh", version="1.0.0")
+ 
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+ 
+    return app
+ 
+ 
+app = get_application()
+ 
+ 
+================================
+Spin up docker container
+@Dockerfile
+
+FROM python:3.13-slim-bookworm
+
+WORKDIR /backend
+
+# Avoid making .pyc files to reduce clutter in the container
+ENV PYTHONDONTWRITEBYTECODE 1
+# Unbuffered output, so logs appear immediately
+ENV PYTHONBUFFERED 1
+
+# install system dependencies
+# updates the package index
+RUN apt-get update \
+    # netcat: port/server checker
+    && apt-get -y install netcat gcc postgresql \
+    # Cleans package cache to reduce image size
+    && apt-get clean
+
+# install python dependencies
+RUN pip install --upgrade pip
+# copy requirements from local to container
+COPY ./requirements.txt /backend/requirements.txt
+RUN pip install -r requirements.txt
+
+# copy the local "backend" folder into the container
+COPY ./backend
+
+================================
+docker-compose.yml
+
+services:
+  server:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend/:/backend/
+    command: uvicorn app.api.server:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    env_file:
+      - ./backend/.env
+    ports:
+      - 8000:8000
+================================
+Bootstrapping the app
+docker-compose up -d --build 
+docker-compose up
+ 
+
+ 

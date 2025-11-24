@@ -1,0 +1,5 @@
+# app
+fastapi==0.121.3 # framework for the backend
+uvicorn==0.38.0 # ASGI server
+pydantic==2.12.4 # validation library
+email-validator==2.3.0 # allow pydantic to validate email

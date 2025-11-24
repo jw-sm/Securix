@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 
 def get_application():
     app = FastAPI(title="Securix", version="1.0.0")
-    
+
     # Browser blocks cross-domain API calls by default
     app.add_middleware(
         CORSMiddleware,
@@ -12,7 +12,7 @@ def get_application():
         allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
-        allow_headers=["*"]
+        allow_headers=["*"],
     )
     return app
 
