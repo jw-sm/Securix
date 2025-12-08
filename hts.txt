@@ -1,3 +1,14 @@
+1. Initial folder setup/structure and requirements.txt setup
+2. Create a server/main file w/ middleware configs
+3. Spin up docker container by creating a dockerfile
+4. docker-compose.yml setup
+5. bootstrap the app by bulding docker compose
+6. fastapi router flow
+
+==================================
+==================================
+==================================
+==================================
 initial setup should look like this
 
 |-- backend
@@ -99,5 +110,18 @@ Bootstrapping the app
 docker-compose up -d --build 
 docker-compose up
 ================================
+fastapi router flow
+1. server.py
+    - create the fastapi app, include the top-level router with a main prefix:
+    app.include_router(api_router, prefix="/api")
+2. app/__init__.py
+    - aggregate all routes modules using APIRouter()
+    - assign module prefixes
+    router.include_router(cves_router, prefix="/cves")
+    router.include_router(users_router, prefix="/users")
+3. route files
+    - define the actual endopints with APIRouter()
+4. URL Composition
+    - /<server prefix>/<module prefix>/<endpoint path>
 
  
