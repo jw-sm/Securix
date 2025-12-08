@@ -10,11 +10,13 @@ services: # Section to define containers/services in the project
       - ./backend/.env # Loads environment variables from .env files
     ports:
       - "8000:8000" # Maps container port 8000 to host port 8000
+    depends_on:
+      - db
 
   db: # database service
     image: postgres:latest
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql/18/
     env_file:
       - ./backend/.env
     ports:
