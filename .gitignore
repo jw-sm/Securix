@@ -1,2 +1,6 @@
 hts.txt
+# byte-compiled files
+__pycache__/
+# environment files
+.env
 
