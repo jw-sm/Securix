@@ -1,14 +1,25 @@
-services: # Section to define container/servic in the project 
+services: # Section to define containers/services in the project
   server: # name of the service
     build: # tells docker to build an image from a Dockerfile
       context: . # Set the build context (The folder docker will use for copying files)
       dockerfile: backend/Dockerfile # Specifies which Dockerfile to use
     volumes:
-      - ./backend:/backend # Mounts the local "./backend" folder to /backend/ inside the container. this will make local changes immediately reflected in the container
+      - ./backend:/backend # Mounts the local "./backend" folder to /backend/ inside the container
     command: ["uvicorn", "app.api.server:app", "--reload", "--workers", "1", "--host", "0.0.0.0", "--port", "8000"] 
     env_file:
-      - ./backend/.env # Loads environment variables from .env files e.g., DATABASE_URL, SECRET_KEY, etc. w/o hardcoding into Docker
+      - ./backend/.env # Loads environment variables from .env files
     ports:
-      - "8000:8000" # Maps container port 8000 to host port 8000. Allow to access app in local browser
- 
- 
+      - "8000:8000" # Maps container port 8000 to host port 8000
+
+  db: # database service
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+
