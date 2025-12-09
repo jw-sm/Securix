@@ -9,23 +9,18 @@ from app.db.tasks import connect_to_db, close_db_connection
 # and when the application shuts down.
 
 
-def create_start_app_handler(app: FastAPI) -> Callable:
-    async def start_app() -> None:
-        await connect_to_db(app)
-
-    return start_app
+async def start_app(app: FastAPI):
+    await connect_to_db(app)
 
 
-def create_stop_app_handler(app: FastAPI) -> Callable:
-    async def stop_app() -> None:
-        await close_db_connection(app)
+async def stop_app(app: FastAPI):
+    await close_db_connection(app)
 
-    return stop_app
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # run start app handler
-    await create_start_app_handler(app)()
+    await start_app(app)
     yield
     # run shutdown handler
-    await create_stop_app_handler(app)()
+    await stop_app(app)
