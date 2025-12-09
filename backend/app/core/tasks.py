@@ -1,5 +1,6 @@
 from typing import Callable
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 
 from app.db.tasks import connect_to_db, close_db_connection
 
@@ -20,3 +21,11 @@ def create_stop_app_handler(app: FastAPI) -> Callable:
         await close_db_connection(app)
 
     return stop_app
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # run start app handler
+    await create_start_app_handler(app)()
+    yield
+    # run shutdown handler
+    await create_stop_app_handler(app)()
