@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from database import Database
+from databases import Database
 from app.core.config import DATABASE_URL
 import logging
 
@@ -20,6 +20,7 @@ async def connect_to_db(app: FastAPI) -> None:
         logger.warn("--- DB CONNECTION ERROR ---")
         logger.warn(e)
         logger.warn("--- DB CONNECTION ERROR ---")
+
 
 # this will disconnect from the database to clean things up
 async def close_db_connection(app: FastAPI) -> None:
