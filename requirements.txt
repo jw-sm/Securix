@@ -7,3 +7,5 @@ email-validator==2.3.0 # allow pydantic to validate email
 databases[postgresql]==0.9.0
 SQLAlchemy==2.0.44
 alembic==1.17.2
+psycopg2-binary
+
