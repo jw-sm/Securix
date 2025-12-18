@@ -1,0 +1,8 @@
+docker compose down -v # "down" stops and remove containers "-v" deletes named & anonymous volumes 
+docker compose up -d --build
+docker compose exec <service name> bash
+alembic upgrade head
+docker compose exec db psql -U postgres -d securix
+\dt
+SELECT * FROM alembic_version;
+
