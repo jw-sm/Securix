@@ -1,4 +1,4 @@
-from app.db.respositories.base import BaseRepository
+from app.db.repositories.base import BaseRepository
 from app.models.cve import CVEDetail
 
 
