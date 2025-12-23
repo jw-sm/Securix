@@ -60,4 +60,3 @@ def downgrade():
     op.drop_table("cvss_metrics")
     op.drop_table("cve_descriptions")
     op.drop_table("cves")
-
