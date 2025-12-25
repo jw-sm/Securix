@@ -44,4 +44,3 @@ cvss_metrics = Table(
     Column("source", Text),
     Column("type", String(16)),
 )
-

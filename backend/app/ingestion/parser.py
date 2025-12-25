@@ -1,7 +1,6 @@
 from app.models.cve import CVEDetail, CVSSMetric, CVEDescription
 from datetime import datetime
 
-
 def parse_cve_item(raw: dict) -> CVEDetail:
     """Normalize a single CVE JSON item to CVEDetail model"""
     cve = raw["cve"]
