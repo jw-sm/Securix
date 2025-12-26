@@ -9,5 +9,4 @@ def fetch_cves(params=None) -> dict:
     return response.json()
 
 if __name__ == "__main__":
-    result = fetch_cves()
-    print(result)
+    print(fetch_cves())
