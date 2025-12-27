@@ -4,16 +4,14 @@ from app.ingestion.fetch import fetch_cves
 import json
 import ast
 
-def parse_cve_item(raw: dict) -> CVEDetail:
-    """Normalize a single CVE JSON item to CVEDetail model"""
-    cve = raw.get["cve"]
-    if not cve:
-        raise ValueError("Invalid CVE item: missing 'cve'")
+    
 
-    descriptions = [
-        CVEDescription(lang=d["lang"], description=d["value"])
-        for d in cve.get("descriptions", [])
-    ]
+def parse_cve_item(vuln: dict) -> CVEDetail:
+    """Normalize a single CVE JSON item to CVEDetail model"""
+
+    cve = vuln.get("cve", {})
+    # all cve are assumed to have a description present, and EN will always be at index 0 
+    en_description = cve["descriptions"][0]["value"]
 
     """
     cvss_metrics = [
@@ -63,6 +61,6 @@ if __name__ == "__main__":
     with open("result.txt") as f:
         data = ast.literal_eval(f.read())
 
-    json_text = json.dumps(data)
-    print(json_text)
-        
+    vuln = data.get("vulnerabilities", [])    
+    for v in vuln:
+        parsed_cve = parse_cve_item(v) 
