@@ -8,7 +8,10 @@ def parse_cve_item(vuln: dict) -> CVEDetail:
 
     cve = vuln.get("cve", {})
     # all cve are assumed to have a description present, and EN will always be at index 0
-    en_description = [CVEDescription(lang = d['lang'], description=d['value']) for d in cve.get("descriptions", [])][0]
+    en_description = [
+        CVEDescription(lang=d["lang"], description=d["value"])
+        for d in cve.get("descriptions", [])
+    ][0]
 
     cvss_metrics = []
     metrics = cve.get("metrics", {})
@@ -42,7 +45,6 @@ def parse_cve_item(vuln: dict) -> CVEDetail:
 
 if __name__ == "__main__":
     # data is currently single-quoted JSON file, which is like a python object
-    # read it with ast.literal_eval before using json.dumps unless data changes
     with open("result.txt") as f:
         data = ast.literal_eval(f.read())
 

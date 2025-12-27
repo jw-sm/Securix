@@ -1,7 +1,6 @@
 from sqlalchemy import insert
-from app.db.tables import cves, cve_description, cvss_metrics
+from app.db.tables import cves, cve_descriptions, cvss_metrics
 from sqlalchemy.engine import Connection
-
 
 def save_cve(conn: Connection, cve_detail):
     """Insert CVE into DB with related tables"""
@@ -11,20 +10,15 @@ def save_cve(conn: Connection, cve_detail):
             cve_id=cve_detail.cve_id,
             source_identifier=cve_detail.source_identifier,
             published_at=cve_detail.published_at,
-            last_modified=cve_detail.last_modified,
+            last_modified_at=cve_detail.last_modified_at,
             vuln_status=cve_detail.vuln_status,
         )
         .returning(cves.c.id)
     )
 
     cve_id = result.scalar()
-
-    for desc in cve_detail.description:
-        conn.execute(
-            insert(cve_description).values(
-                cve_id=cve_id, lang=desc.lang, description=desc.description
-            )
-        )
+    #TODO: GET DESCRIPTION
+    desc = conn.execute(insert(cve_descriptions).values(cve_id=cve_id, lang=cve_detail.lang, description=cve_detail.description))
 
     for cvss in cve_detail.cvss_metrics:
         conn.execute(
@@ -38,3 +32,4 @@ def save_cve(conn: Connection, cve_detail):
                 type=cvss.type,
             )
         )
+    return cve_id
