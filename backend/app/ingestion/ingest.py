@@ -7,6 +7,7 @@ from ingestion.session import get_connection
 
 logger = logging.getLogger(__name__)
 
+
 def run_ingestion():
     logger.info("Starting CVE ingestion")
 
@@ -16,10 +17,11 @@ def run_ingestion():
 
     with get_connection as conn:
         for item in items:
-            cve_detail  = parse_cve_item(item)
+            cve_detail = parse_cve_item(item)
             save_cve(conn, cve_detail)
 
     logger.info(f"ingested {len(items)} CVEs successfully.")
-    
+
+
 if __name__ == "__main__":
     run_ingestion()
