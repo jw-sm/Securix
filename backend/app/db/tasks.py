@@ -1,10 +1,12 @@
 from fastapi import FastAPI
-from databases import Database
 from app.core.config import DATABASE_URL
+from sqlalchemy.ext.asyncio import create_async_engine
 import logging
 
 logger = logging.getLogger(__name__)
 
+def create_database():
+    return Database(DATABASE_URL, min_size=2, max_size=10)
 
 # using the database pkg to establish connection to the postgresql db
 # once connected, attach it as _db key to the state object on the FastAPI app.

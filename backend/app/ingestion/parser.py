@@ -51,3 +51,4 @@ if __name__ == "__main__":
     vuln = data.get("vulnerabilities", [])
     for v in vuln:
         parsed_cve = parse_cve_item(v)
+        breakpoint()

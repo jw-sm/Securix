@@ -10,6 +10,7 @@ class CVE(CoreModel):
 class CVEWithID(IDModelMixin, CVE):
     pass
 
+
 class CVESearchResponse(CoreModel):
     total_results: int
     results_per_page: int
