@@ -1,34 +1,48 @@
-from fastapi import FastAPI
-from app.core.config import DATABASE_URL
-from sqlalchemy.ext.asyncio import create_async_engine
+import asyncio
 import logging
+from fastapi import FastAPI
+from databases import Database
+from app.core.config import DATABASE_URL
 
 logger = logging.getLogger(__name__)
 
-def create_database():
+MAX_RETRIES = 5
+RETRY_DELAY = 3  
+
+def create_database() -> Database:
+    """Factory for creating Database instances."""
     return Database(DATABASE_URL, min_size=2, max_size=10)
 
-# using the database pkg to establish connection to the postgresql db
-# once connected, attach it as _db key to the state object on the FastAPI app.
 async def connect_to_db(app: FastAPI) -> None:
-    database = Database(
-        DATABASE_URL, min_size=2, max_size=10
-    )  # can be configured in config as well
+    """Connect to the database with retries."""
+    db = create_database()
+    attempt = 0
 
-    try:
-        await database.connect()
-        app.state._db = database
-    except Exception as e:
-        logger.warn("--- DB CONNECTION ERROR ---")
-        logger.warn(e)
-        logger.warn("--- DB CONNECTION ERROR ---")
+    while attempt < MAX_RETRIES:
+        try:
+            await db.connect()
+            app.state._db = db
+            logger.info("✅ Connected to database")
+            return
+        except Exception as e:
+            attempt += 1
+            logger.warning(f"--- DB CONNECTION ERROR (attempt {attempt}) ---")
+            logger.exception(e)
+            if attempt < MAX_RETRIES:
+                logger.info(f"Retrying in {RETRY_DELAY} seconds...")
+                await asyncio.sleep(RETRY_DELAY)
+            else:
+                logger.error("Could not connect to database after multiple attempts.")
+                raise
 
-
-# this will disconnect from the database to clean things up
 async def close_db_connection(app: FastAPI) -> None:
-    try:
-        await app.state._db.disconnect()
-    except Exception as e:
-        logger.warn("--- DB DISCONECT ERROR ---")
-        logger.warn(e)
-        logger.warn("--- DB DISCONECT ERROR ---")
+    """Disconnect from the database safely."""
+    db = getattr(app.state, "_db", None)
+    if db:
+        try:
+            await db.disconnect()
+            logger.info("✅ Disconnected from database")
+        except Exception as e:
+            logger.warning("--- DB DISCONNECT ERROR ---")
+            logger.exception(e)
+
