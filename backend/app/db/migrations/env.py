@@ -24,7 +24,13 @@ def run_migrations_online() -> None:
     Run migrations in 'online mode'
     """
     connectable = config.attributes.get("connection", None)
-    config.set_main_option("sqlalchemy.url", str(DATABASE_URL))
+    db_url_from_cli = None
+    x_arg_dict = alembic.context.get_x_argument(as_dictionary=True)
+    if "db_url" in x_arg_dict:
+        db_url_from_cli = x_arg_dict["db_url"]
+
+    database_url = db_url_from_cli or str(DATABASE_URL)
+    config.set_main_option("sqlalchemy.url", database_url)
 
     if connectable is None:
         connectable = engine_from_config(

@@ -8,7 +8,6 @@ def engine():
     engine = create_engine(TEST_DB_URL, echo=True,)
     return engine
 
-
 @pytest.fixture(scope="session", autouse=True)
 def setup_schema():
     from alembic import command

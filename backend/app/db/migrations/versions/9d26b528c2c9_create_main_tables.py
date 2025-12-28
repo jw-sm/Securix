@@ -13,7 +13,6 @@ down_revision = None
 branch_labels = None
 depends_on = None
 
-
 def create_cves_table():
     op.create_table(
         "cves",
@@ -25,7 +24,6 @@ def create_cves_table():
         sa.Column("vuln_status", sa.String(32)),
     )
 
-
 def create_descriptions_table():
     op.create_table(
         "cve_descriptions",
@@ -34,7 +32,6 @@ def create_descriptions_table():
         sa.Column("lang", sa.String(8), nullable=False),
         sa.Column("description", sa.Text, nullable=False),
     )
-
 
 def create_cvss_table():
     op.create_table(
@@ -48,7 +45,6 @@ def create_cvss_table():
         sa.Column("source", sa.Text),
         sa.Column("type", sa.String(16)),
     )
-
 
 def upgrade():
     create_cves_table()

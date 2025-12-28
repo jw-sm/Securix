@@ -10,7 +10,6 @@ class CVE(CoreModel):
 class CVEWithID(IDModelMixin, CVE):
     pass
 
-
 class CVESearchResponse(CoreModel):
     total_results: int
     results_per_page: int
@@ -35,10 +34,10 @@ class CVSSMetric(CoreModel):
 # Full CVE response
 class CVEDetail(CoreModel):
     cve_id: str
-    source_identifiers: list[str] | None
+    source_identifier: str | None
     published_at: datetime | None
     last_modified_at: datetime | None
     vuln_status: str
 
-    descriptions: list[CVEDescription]
+    description: CVEDescription
     cvss_metrics: list[CVSSMetric]
