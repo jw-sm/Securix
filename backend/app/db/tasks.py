@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI 
 from databases import Database
 from app.core.config import DATABASE_URL
 

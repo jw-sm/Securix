@@ -27,7 +27,7 @@ cve_descriptions = Table(
     "cve_descriptions",
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("cve_id", Integer, ForeignKey("cves.id", ondelete="CASCADE")),
+    Column("cve_id", sa.String(32), ForeignKey("cves.cve_id", ondelete="CASCADE")),
     Column("lang", String(8), nullable=False),
     Column("description", Text, nullable=False),
 )
@@ -36,7 +36,7 @@ cvss_metrics = Table(
     "cvss_metrics",
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("cve_id", Integer, ForeignKey("cves.id", ondelete="CASCADE")),
+    Column("cve_id", sa.String(32), ForeignKey("cves.cve_id", ondelete="CASCADE")),
     Column("version", String(8)),
     Column("base_score", Float),
     Column("severity", String(16)),

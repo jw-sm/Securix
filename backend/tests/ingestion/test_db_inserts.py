@@ -10,12 +10,10 @@ def test_insert_cve(db_conn):
         insert(cves).values(cve_id="CVE-1999-0095").returning(cves.c.id)
     )
     """
-    
     with open("result.txt") as f:
         data = ast.literal_eval(f.read())
     vuln = data.get("vulnerabilities", [])
     cve = parse_cve_item(vuln[0])
 
     result = save_cve(db_conn, cve)
-
     assert result is not None

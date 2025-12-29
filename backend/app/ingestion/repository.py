@@ -7,7 +7,12 @@ async def save_cve(db: Database, cve_detail):
     # CVE
     query = """
     INSERT INTO cves (cve_id, source_identifier, published_at, last_modified_at, vuln_status)
-    VALUES (:cve_id, :source_identifier, :published_at, :last_modified_at, :vuln_Status)    
+    VALUES (:cve_id, :source_identifier, :published_at, :last_modified_at, :vuln_status)    
+    ON CONFLICT (cve_id) DO UPDATE
+    SET source_identifier = EXCLUDED.source_identifier,
+        published_at = EXCLUDED.published_at,
+        last_modified_at = EXCLUDED.last_modified_at,
+        vuln_status = EXCLUDED.vuln_status
     RETURNING id
     """
 
@@ -23,18 +28,16 @@ async def save_cve(db: Database, cve_detail):
     )
 
     # DESCRIPTION
-
     query = """
-    INSERT INTO cve_description (cve_id, lang, description)
+    INSERT INTO cve_descriptions (cve_id, lang, description)
     VALUES (:cve_id, :lang, :description)
     """
-
     await db.execute(
         query=query,
         values={
-            "cve_id": cve_id,
-            "lang": cve_id.description.lang,
-            "description": cve_id.description.description,
+            "cve_id": cve_detail.cve_id,
+            "lang": cve_detail.description.lang,
+            "description": cve_detail.description.description,
         },
     )
 
@@ -47,7 +50,7 @@ async def save_cve(db: Database, cve_detail):
         await db.execute(
             query=query,
             values={
-                "cve_id": cve_id,
+                "cve_id": cve_detail.cve_id,
                 "version": cvss.version,
                 "base_score": cvss.base_score,
                 "severity": cvss.severity,

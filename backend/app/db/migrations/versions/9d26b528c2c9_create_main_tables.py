@@ -1,10 +1,3 @@
-"""create_cve_tables
-
-Revision ID: a1b2c3d4e5f6
-Revises:
-Create Date: 2025-12-16
-"""
-
 from alembic import op
 import sqlalchemy as sa
 
@@ -30,7 +23,12 @@ def create_descriptions_table():
     op.create_table(
         "cve_descriptions",
         sa.Column("id", sa.Integer, primary_key=True),
-        sa.Column("cve_id", sa.Integer, sa.ForeignKey("cves.id", ondelete="CASCADE")),
+        sa.Column(
+            "cve_id",
+            sa.String(32),
+            sa.ForeignKey("cves.cve_id", ondelete="CASCADE"),  # FIXED
+            nullable=False,
+        ),
         sa.Column("lang", sa.String(8), nullable=False),
         sa.Column("description", sa.Text, nullable=False),
     )
@@ -40,7 +38,12 @@ def create_cvss_table():
     op.create_table(
         "cvss_metrics",
         sa.Column("id", sa.Integer, primary_key=True),
-        sa.Column("cve_id", sa.Integer, sa.ForeignKey("cves.id", ondelete="CASCADE")),
+        sa.Column(
+            "cve_id",
+            sa.String(32),
+            sa.ForeignKey("cves.cve_id", ondelete="CASCADE"),  # FIXED
+            nullable=False,
+        ),
         sa.Column("version", sa.String(8)),
         sa.Column("base_score", sa.Float),
         sa.Column("severity", sa.String(16)),
@@ -60,3 +63,4 @@ def downgrade():
     op.drop_table("cvss_metrics")
     op.drop_table("cve_descriptions")
     op.drop_table("cves")
+

@@ -3,10 +3,15 @@ from sqlalchemy import create_engine
 
 TEST_DB_URL = "postgresql://postgres:postgres@db:5432/securix_test"
 
+
 @pytest.fixture(scope="session")
 def engine():
-    engine = create_engine(TEST_DB_URL, echo=True,)
+    engine = create_engine(
+        TEST_DB_URL,
+        echo=True,
+    )
     return engine
+
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_schema():
@@ -15,8 +20,7 @@ def setup_schema():
 
     alembic_cfg = Config("alembic.ini")
     alembic_cfg.set_main_option(
-    "sqlalchemy.url",
-    "postgresql://postgres:postgres@db:5432/securix_test"
+        "sqlalchemy.url", "postgresql://postgres:postgres@db:5432/securix_test"
     )
     command.upgrade(alembic_cfg, "head")
 
