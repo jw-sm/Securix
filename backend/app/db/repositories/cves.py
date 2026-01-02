@@ -5,7 +5,6 @@ class CVERepository(BaseRepository):
     """
     All database actions associated with the CVE resources
     """
-
     async def get_cve_by_id(self, *, cve_id: str) -> CVEDetail:
         query="""
         SELECT
