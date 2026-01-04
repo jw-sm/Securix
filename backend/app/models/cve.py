@@ -1,44 +1,30 @@
-from datetime import datetime
-from app.models.core import CoreModel, IDModelMixin
+from pydantic import BaseModel
+from typing import Optional
 
+class Reference(BaseModel):
+    url: str
+    source: str
 
-class CVE(CoreModel):
+""" to be added soon
+class AffectedProducts(BaseModel):
+    vendor: str
+    product: str
+    version_start: Optional[str]
+    version_end_excluding: Optional[str]
+"""
+
+class CVEMetric(BaseModel):
+    score: float
+    severity: str
+    vector: str
+    attack_vector: Optional[str]
+    
+class CVE(BaseModel):
     cve_id: str
-    vuln_status: str
-
-
-class CVEWithID(IDModelMixin, CVE):
-    pass
-
-
-class CVESearchResponse(CoreModel):
-    total_results: int
-    results_per_page: int
-    start_index: int
-    items: list[CVEWithID]
-
-
-class CVEDescription(CoreModel):
-    lang: str
+    status: str
+    published: str
+    last_modified: str
     description: str
-
-
-class CVSSMetric(CoreModel):
-    version: str
-    base_score: float | None
-    severity: str | None
-    vector_string: str | None
-    source: str | None
-    type: str | None
-
-
-# Full CVE response
-class CVEDetail(CoreModel):
-    cve_id: str
-    source_identifier: str | None
-    published_at: datetime | None
-    last_modified_at: datetime | None
-    vuln_status: str
-
-    description: CVEDescription
-    cvss_metrics: list[CVSSMetric]
+    cvss: Optional[CVEMetric]
+    weaknesses: list[str] = []
+    references: list[Reference] = []
