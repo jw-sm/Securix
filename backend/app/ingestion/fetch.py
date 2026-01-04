@@ -1,6 +1,6 @@
 import httpx
 
-NVD_API_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0?startIndex=326044"
+NVD_API_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 
 def fetch_cves(params=None) -> dict:
     """Fetch CVEs from NVD and return JSON."""
@@ -9,4 +9,8 @@ def fetch_cves(params=None) -> dict:
     return response.json()
 
 if __name__ == "__main__":
-    print(fetch_cves())
+    print(f"Fetching {NVD_API_URL}...")
+    result = fetch_cves({"startIndex": 326059})
+    with open("result.txt", "x") as f:
+        f.write(str(result))
+    print("Done!")
