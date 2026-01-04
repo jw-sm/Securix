@@ -1,4 +1,5 @@
 import ast
+from app.models.cve import CVE, Reference
 
 def parse_nvd(item: dict) -> CVE:
     cve_data = item["cve"]
@@ -10,15 +11,15 @@ def parse_nvd(item: dict) -> CVE:
     cvss_data = None
     for metric_key in ["cvssMetricV40", "cvssMetricV31", "cvssMetricV30"]:
         metrics = cve_data.get("metrics", {}).get(metric_key, [])
-            if metrics:
-                cvss_info = metrics[0]["cvssData"]
-                cvss_data = CVEMetric(
-                    score=cvss_info.get("baseScore", 0.0),
-                    severity=cvss_info.get("baseSeverity", "Unknown"),
-                    vector=cvss_info.get("vectorString", ""),
-                    attack_vector=cvss_info.get("attackVector")
-                )
-                break
+        if metrics:
+            cvss_info = metrics[0]["cvssData"]
+            cvss_data = CVEMetric(
+                score=cvss_info.get("baseScore", 0.0),
+                severity=cvss_info.get("baseSeverity", "Unknown"),
+                vector=cvss_info.get("vectorString", ""),
+                attack_vector=cvss_info.get("attackVector")
+            )
+            break
     # Weaknesses
     weaknesses = [
         w_desc["value"]
@@ -41,8 +42,7 @@ if __name__ == "__main__":
     # data is currently single-quoted JSON file, which is like a python object
     with open("result.txt") as f:
         data = ast.literal_eval(f.read())
-
-    vuln = data.get("vulnerabilities", [])
-    for v in vuln:
-        parsed_cve = parse_cve_item(v)
-        breakpoint()
+        vulns = data.get("vulnerabilities", [])
+        
+    for vul in vulns:
+        parse_nvd(vul) 
