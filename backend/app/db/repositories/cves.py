@@ -1,10 +1,9 @@
 from app.db.repositories.base import BaseRepository
-from app.models.cve import CVEDetail
+from app.models.cve import CVE
 import json
 
-
 class CVERepository(BaseRepository):
-    async def get_cve_by_id(self, cve_id: str) -> CVEDetail | None:
+    async def get_cve_by_id(self, cve_id: str) -> CVE | None:
     # this will work for now, but we can change the schemas' FK to id probably???
         query = """
     SELECT
@@ -46,7 +45,6 @@ class CVERepository(BaseRepository):
 
     FROM cves c
     WHERE c.cve_id = :cve_id;
-
     """
         cve_record = await self.db.fetch_one(query=query, values={"cve_id": cve_id})
 
@@ -65,3 +63,4 @@ class CVERepository(BaseRepository):
             cve["cvss_metrics"] = json.loads(cve["cvss_metrics"])
 
         return CVEDetail(**cve)
+
