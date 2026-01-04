@@ -1,48 +1,42 @@
-from app.models.cve import CVEDetail, CVSSMetric, CVEDescription
-from datetime import datetime
 import ast
 
+def parse_nvd(item: dict) -> CVE:
+    cve_data = item["cve"]
 
-def parse_cve_item(vuln: dict) -> CVEDetail:
-    """Normalize a single CVE JSON item to CVEDetail model"""
+    # prioritize English, fallback to "No description" if none.
+    description = next((d["value"] for d in cve_data.get("descriptions", []) if d["lang"] == "en"), "No description")
 
-    cve = vuln.get("cve", {})
-    # all cve are assumed to have a description present, and EN will always be at index 0
-    en_description = [
-        CVEDescription(lang=d["lang"], description=d["value"])
-        for d in cve.get("descriptions", [])
-    ][0]
-
-    cvss_metrics = []
-    metrics = cve.get("metrics", {})
-    for key in ("cvssMetricV31", "cvssMetricV30", "cvssMetricV2"):
-        for m in metrics.get(key, []):
-            cvss_metrics.append(
-                CVSSMetric(
-                    version=m["cvssData"].get("version"),
-                    base_score=m["cvssData"].get("baseScore"),
-                    severity=m.get("baseSeverity"),
-                    vector_string=m["cvssData"].get("vectorString"),
-                    source=m.get("source"),
-                    type=m.get("type"),
+    # CVSS Metric
+    cvss_data = None
+    for metric_key in ["cvssMetricV40", "cvssMetricV31", "cvssMetricV30"]:
+        metrics = cve_data.get("metrics", {}).get(metric_key, [])
+            if metrics:
+                cvss_info = metrics[0]["cvssData"]
+                cvss_data = CVEMetric(
+                    score=cvss_info.get("baseScore", 0.0),
+                    severity=cvss_info.get("baseSeverity", "Unknown"),
+                    vector=cvss_info.get("vectorString", ""),
+                    attack_vector=cvss_info.get("attackVector")
                 )
-            )
+                break
+    # Weaknesses
+    weaknesses = [
+        w_desc["value"]
+        for w in cve_data.get("weaknesses", [])
+        for w_desc in w.get("description", [])
+        if w_desc["lang"] == "en"
+    ]
+        
+    # Reference
+    reference = [
+        Reference(
+            url=ref["url"],
+            source=ref["source"],
+        )
+        for ref in cve_data.get("references", [])
+    ]
 
-    return CVEDetail(
-        cve_id=cve.get("id"),
-        source_identifier=cve.get("sourceIdentifier"),
-        published_at=datetime.fromisoformat(cve["published"])
-        if cve.get("published")
-        else None,
-        last_modified_at=datetime.fromisoformat(cve["lastModified"])
-        if cve.get("lastModified")
-        else None,
-        vuln_status=cve.get("vulnStatus"),
-        description=en_description,
-        cvss_metrics=cvss_metrics,
-    )
-
-
+                
 if __name__ == "__main__":
     # data is currently single-quoted JSON file, which is like a python object
     with open("result.txt") as f:
