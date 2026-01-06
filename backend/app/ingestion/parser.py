@@ -1,5 +1,5 @@
 import ast
-from app.models.cve import CVE, Reference
+from app.models.cve import CVE, CVEMetric, Reference
 
 def parse_nvd(item: dict) -> CVE:
     cve_data = item["cve"]
@@ -37,6 +37,11 @@ def parse_nvd(item: dict) -> CVE:
         for ref in cve_data.get("references", [])
     ]
 
+    return CVE(
+        cve_id=cve_data.get("cve", "")
+        stauts=cve_data.get("vulnStatus", "")
+    )
+
                 
 if __name__ == "__main__":
     # data is currently single-quoted JSON file, which is like a python object
@@ -45,4 +50,5 @@ if __name__ == "__main__":
         vulns = data.get("vulnerabilities", [])
         
     for vul in vulns:
-        parse_nvd(vul) 
+        v = parse_nvd(vul)
+        breakpoint()
