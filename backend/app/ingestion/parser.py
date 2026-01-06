@@ -38,8 +38,14 @@ def parse_nvd(item: dict) -> CVE:
     ]
 
     return CVE(
-        cve_id=cve_data.get("cve", "")
-        stauts=cve_data.get("vulnStatus", "")
+        cve_id=cve_data.get("id", ""),
+        status=cve_data.get("vulnStatus", ""),
+        published=cve_data.get("published", ""),
+        last_modified=cve_data.get("lastModified", ""),
+        description=description,
+        cvss=cvss_data,
+        weaknesses=weaknesses,
+        references=reference,
     )
 
                 
