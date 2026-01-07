@@ -14,12 +14,16 @@ def parse_nvd(item: dict) -> CVE:
         if metrics:
             cvss_info = metrics[0]["cvssData"]
             cvss_data = CVEMetric(
+                source=metrics[0].get("source", ""), 
+                type=metrics[0].get("type", ""),
+                version=cvss_info.get("version", ""),
                 score=cvss_info.get("baseScore", 0.0),
                 severity=cvss_info.get("baseSeverity", "Unknown"),
                 vector=cvss_info.get("vectorString", ""),
                 attack_vector=cvss_info.get("attackVector")
             )
             break
+
     # Weaknesses
     weaknesses = [
         w_desc["value"]
