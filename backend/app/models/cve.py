@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 from typing import Optional
 
 class Reference(BaseModel):
@@ -14,16 +15,19 @@ class AffectedProducts(BaseModel):
 """
 
 class CVEMetric(BaseModel):
+    version: str
     score: float
     severity: str
     vector: str
+    source: str
+    type: str
     attack_vector: Optional[str]
     
 class CVE(BaseModel):
     cve_id: str
     status: str
-    published: str
-    last_modified: str
+    published_at: datetime 
+    last_modified_at: datetime 
     description: str
     cvss: Optional[CVEMetric]
     weaknesses: list[str] = []

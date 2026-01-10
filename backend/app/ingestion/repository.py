@@ -6,13 +6,13 @@ async def save_cve(db: Database, cve_detail):
 
     # CVE
     query = """
-    INSERT INTO cves (cve_id, source_identifier, published_at, last_modified_at, vuln_status)
-    VALUES (:cve_id, :source_identifier, :published_at, :last_modified_at, :vuln_status)    
+    INSERT INTO cves (cve_id, status, published_at, last_modified_at, description)
+    VALUES (:cve_id, :status, :published_at, :last_modified_at, :description)    
     ON CONFLICT (cve_id) DO UPDATE
-    SET source_identifier = EXCLUDED.source_identifier,
+    SET status = EXCLUDED.status,
         published_at = EXCLUDED.published_at,
         last_modified_at = EXCLUDED.last_modified_at,
-        vuln_status = EXCLUDED.vuln_status
+        description = EXCLUDED.description
     RETURNING id
     """
 
@@ -20,44 +20,43 @@ async def save_cve(db: Database, cve_detail):
         query=query,
         values={
             "cve_id": cve_detail.cve_id,
-            "source_identifier": cve_detail.source_identifier,
+            "status": cve_detail.status,
             "published_at": cve_detail.published_at,
             "last_modified_at": cve_detail.last_modified_at,
-            "vuln_status": cve_detail.vuln_status,
+            "description": cve_detail.description,
         },
     )
 
     # DESCRIPTION
     query = """
-    INSERT INTO cve_descriptions (cve_id, lang, description)
-    VALUES (:cve_id, :lang, :description)
+    INSERT INTO cve_descriptions (cve_id, description)
+    VALUES (:cve_id, :description)
     """
     await db.execute(
         query=query,
         values={
             "cve_id": cve_detail.cve_id,
-            "lang": cve_detail.description.lang,
-            "description": cve_detail.description.description,
+            "description": cve_detail.description,
         },
     )
 
     # CVSS METRICS
-    for cvss in cve_detail.cvss_metrics:
-        query = """
-        INSERT INTO cvss_metrics (cve_id, version, base_score, severity, vector_string, source, type)
-        VALUES (:cve_id, :version, :base_score, :severity, :vector_string, :source, :type)
-        """
-        await db.execute(
-            query=query,
-            values={
-                "cve_id": cve_detail.cve_id,
-                "version": cvss.version,
-                "base_score": cvss.base_score,
-                "severity": cvss.severity,
-                "vector_string": cvss.vector_string,
-                "source": cvss.source,
-                "type": cvss.type,
-            },
-        )
-
+    cvss = cve_detail.cvss
+    assert cvss is not None
+    query = """
+    INSERT INTO cvss_metrics (cve_id, version, base_score, severity, vector_string, source, type)
+    VALUES (:cve_id, :version, :base_score, :severity, :vector_string, :source, :type)
+    """
+    await db.execute(
+        query=query,
+        values={
+            "cve_id": cve_detail.cve_id,
+            "version": cvss.version,
+            "base_score": cvss.score,
+            "severity": cvss.severity,
+            "vector_string": cvss.vector,
+            "source": cvss.source,
+            "type": cvss.type,
+        },
+    )
     return cve_id

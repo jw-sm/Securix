@@ -10,7 +10,7 @@ def fetch_cves(params=None) -> dict:
 
 if __name__ == "__main__":
     print(f"Fetching {NVD_API_URL}...")
-    result = fetch_cves({"startIndex": 326059})
+    result = fetch_cves({"startIndex": 20000, "resultsPerPage": 1})
     with open("result.txt", "x") as f:
         f.write(str(result))
     print("Done!")

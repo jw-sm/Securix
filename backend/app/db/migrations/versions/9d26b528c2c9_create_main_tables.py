@@ -48,7 +48,6 @@ def create_descriptions_table():
             sa.ForeignKey("cves.cve_id", ondelete="CASCADE"),
             nullable=False,
         ),
-        sa.Column("lang", sa.String(8), nullable=False),
         sa.Column("description", sa.Text, nullable=False),
     )
 

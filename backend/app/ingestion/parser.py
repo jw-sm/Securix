@@ -9,7 +9,7 @@ def parse_nvd(item: dict) -> CVE:
 
     # CVSS Metric
     cvss_data = None
-    for metric_key in ["cvssMetricV40", "cvssMetricV31", "cvssMetricV30"]:
+    for metric_key in ["cvssMetricV40", "cvssMetricV31", "cvssMetricV30", "cvssMetricV2", "cvssMetricV1"]:
         metrics = cve_data.get("metrics", {}).get(metric_key, [])
         if metrics:
             cvss_info = metrics[0]["cvssData"]
@@ -18,7 +18,7 @@ def parse_nvd(item: dict) -> CVE:
                 type=metrics[0].get("type", ""),
                 version=cvss_info.get("version", ""),
                 score=cvss_info.get("baseScore", 0.0),
-                severity=cvss_info.get("baseSeverity", "Unknown"),
+                severity=metrics[0].get("baseSeverity", "Unknown"),
                 vector=cvss_info.get("vectorString", ""),
                 attack_vector=cvss_info.get("attackVector")
             )
@@ -41,16 +41,17 @@ def parse_nvd(item: dict) -> CVE:
         for ref in cve_data.get("references", [])
     ]
 
-    return CVE(
+    c = CVE(
         cve_id=cve_data.get("id", ""),
         status=cve_data.get("vulnStatus", ""),
-        published=cve_data.get("published", ""),
-        last_modified=cve_data.get("lastModified", ""),
+        published_at=cve_data.get("published", ""),
+        last_modified_at=cve_data.get("lastModified", ""),
         description=description,
         cvss=cvss_data,
         weaknesses=weaknesses,
         references=reference,
     )
+    return c
 
                 
 if __name__ == "__main__":
